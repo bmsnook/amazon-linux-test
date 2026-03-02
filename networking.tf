@@ -148,25 +148,48 @@ resource "aws_vpc_security_group_egress_rule" "egress_all" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-resource "aws_security_group" "project_sg_hostself" {
-  count  = var.main_instance_count
-  name   = "${var.project}-self_sg-${random_id.al2023_node_id[count.index].dec}"
+resource "aws_security_group" "al2023_sg_hostself" {
+  count  = var.al2023_instance_count
+  name   = "${var.project}-al2023-self_sg-${random_id.al2023_node_id[count.index].dec}"
   vpc_id = aws_vpc.project_vpc.id
 
   tags = {
-    Name      = "${var.project}_self_sg-${random_id.al2023_node_id[count.index].dec}"
+    Name      = "${var.project}-al2023-self_sg-${random_id.al2023_node_id[count.index].dec}"
     Project   = var.project
     ManagedBy = "Terraform"
     Owner     = var.owner
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ingress_hostself" {
-  count             = var.main_instance_count
+resource "aws_security_group" "amzn2_sg_hostself" {
+  count  = var.amzn2_instance_count
+  name   = "${var.project}-amzn2-self_sg-${random_id.amzn2_node_id[count.index].dec}"
+  vpc_id = aws_vpc.project_vpc.id
+
+  tags = {
+    Name      = "${var.project}-amzn2-self_sg-${random_id.amzn2_node_id[count.index].dec}"
+    Project   = var.project
+    ManagedBy = "Terraform"
+    Owner     = var.owner
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_hostself_al2023" {
+  count             = var.al2023_instance_count
   from_port         = 0
   to_port           = 65535
   ip_protocol       = "-1"
   cidr_ipv4         = "${aws_instance.al2023_instance[count.index].public_ip}/32"
-  security_group_id = aws_security_group.project_sg_hostself[count.index].id
+  security_group_id = aws_security_group.al2023_sg_hostself[count.index].id
+  description       = "Allow all traffic from self"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ingress_hostself_amzn2" {
+  count             = var.amzn2_instance_count
+  from_port         = 0
+  to_port           = 65535
+  ip_protocol       = "-1"
+  cidr_ipv4         = "${aws_instance.amzn2_instance[count.index].public_ip}/32"
+  security_group_id = aws_security_group.amzn2_sg_hostself[count.index].id
   description       = "Allow all traffic from self"
 }
