@@ -58,7 +58,7 @@ resource "aws_instance" "amzn2_instance" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "sed -i'' -e '/^Host '${self.public_ip}'/,/^$/d' ~/.ssh/config"
+    command = "sed -i'' -e '/^Host '${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}'/,/^$/d' ~/.ssh/config"
   }
 
   provisioner "local-exec" {
