@@ -25,22 +25,25 @@ resource "aws_instance" "amzn2_instance" {
 
   user_data = <<-EOF
               #!/bin/bash
-              hostnamectl set-hostname "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}-${count.index + 1}"
+              hostnamectl set-hostname "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}"
               EOF
 
   tags = merge(
     local.global_tags,
     {
       # Name        = "${var.project}-main-${random_id.amzn2_node_id[count.index].dec}"
-      Name   = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}-${count.index + 1}",
+      # Name   = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}-${count.index + 1}",
+      Name   = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}",
       NodeID = random_id.amzn2_node_id[count.index].dec
     }
   )
 
   provisioner "local-exec" {
     command = templatefile("ssh-config-${local.host_os}.tpl", {
-      host     = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}-${count.index + 1}",
-      hostname = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}-${count.index + 1}.${var.domain_name}",
+      # host     = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}-${count.index + 1}",
+      # hostname = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}-${count.index + 1}.${var.domain_name}",
+      host     = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}",
+      hostname = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}.${var.domain_name}",
       hostip   = self.public_ip,
       # user         = "ubuntu",
       user         = "ec2-user",
@@ -67,7 +70,8 @@ resource "aws_instance" "amzn2_instance" {
 resource "aws_route53_record" "amzn2_instance_records" {
   count   = var.amzn2_instance_count
   zone_id = data.aws_route53_zone.hosted_zone.zone_id
-  name    = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}-${count.index + 1}.${var.domain_name}"
+  # name    = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}-${count.index + 1}.${var.domain_name}"
+  name    = "${var.project}-amzn2-${var.environment}-${random_id.amzn2_node_id[count.index].dec}.${var.domain_name}"
   type    = "CNAME"
   ttl     = 300
   records = [aws_instance.amzn2_instance[count.index].public_dns]

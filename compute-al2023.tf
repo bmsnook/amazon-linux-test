@@ -24,13 +24,14 @@ resource "aws_instance" "al2023_instance" {
 
   user_data = <<-EOF
               #!/bin/bash
-              hostnamectl set-hostname "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}-${count.index + 1}"
+              hostnamectl set-hostname "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}"
               EOF
 
   tags = merge(
     {
       # Name        = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}"
-      Name   = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}-${count.index + 1}",
+      # Name   = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}-${count.index + 1}",
+      Name   = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}",
       NodeID = random_id.al2023_node_id[count.index].dec
     },
     local.global_tags
@@ -38,8 +39,10 @@ resource "aws_instance" "al2023_instance" {
 
   provisioner "local-exec" {
     command = templatefile("ssh-config-${local.host_os}.tpl", {
-      host     = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}-${count.index + 1}",
-      hostname = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}-${count.index + 1}.${var.domain_name}",
+      # host     = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}-${count.index + 1}",
+      # hostname = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}-${count.index + 1}.${var.domain_name}",
+      host     = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}",
+      hostname = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}.${var.domain_name}",
       hostip   = self.public_ip,
       # user         = "ubuntu",
       user         = "ec2-user",
@@ -66,7 +69,8 @@ resource "aws_instance" "al2023_instance" {
 resource "aws_route53_record" "al2023_instance_records" {
   count   = var.al2023_instance_count
   zone_id = data.aws_route53_zone.hosted_zone.zone_id
-  name    = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}-${count.index + 1}.${var.domain_name}"
+  # name    = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}-${count.index + 1}.${var.domain_name}"
+  name    = "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}.${var.domain_name}"
   type    = "CNAME"
   ttl     = 300
   records = [aws_instance.al2023_instance[count.index].public_dns]

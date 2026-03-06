@@ -15,11 +15,11 @@ locals {
     Owner     = var.owner
     Project   = var.project
   }
-
-  amzn2_ami_id = data.aws_ssm_parameter.amzn2_kernel_510_latest_ami.insecure_value
-  
   # Combine base_tags with additional_tags from tfvars, allowing tfvars to override base_tags if there are conflicts
   global_tags = merge(local.base_tags, var.additional_tags)
+
+  amzn2_ami_id = data.aws_ssm_parameter.amzn2_kernel_510_latest_ami.insecure_value
+
 
   # "${var.project}-al2023-${var.environment}-${random_id.al2023_node_id[count.index].dec}"
   # amzn2_instance_names = [for i in range(var.amzn2_instance_count) : "${var.project}-amzn2-${var.environment}-${i}"]
