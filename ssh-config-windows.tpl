@@ -1,7 +1,7 @@
 add-content -path "$${env:HOMEDRIVE}$${env:HOMEPATH}/.ssh/config" -value @'
 
+# AWS Instance: ${hostip}
 Host ${host}
-    # IP ${hostip}
     HostName ${hostname}
     User ${user}
     IdentityFile ${identityfile}

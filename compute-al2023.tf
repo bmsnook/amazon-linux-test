@@ -57,7 +57,7 @@ resource "aws_instance" "al2023_instance" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "sed -i'' -e '/^Host '${self.public_ip}'/,/^$/d' ~/.ssh/config"
+    command = "sed -i'' -e '/^# AWS Instance: '${self.public_ip}'/,/^$/d' ~/.ssh/config"
   }
 
   provisioner "local-exec" {

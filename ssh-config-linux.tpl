@@ -1,7 +1,7 @@
 cat << EOF >> ~/.ssh/config
 
+# AWS Instance: ${hostip}
 Host ${host}
-    # IP ${hostip}
     HostName ${hostname}
     User ${user}
     IdentityFile ${identityfile}
